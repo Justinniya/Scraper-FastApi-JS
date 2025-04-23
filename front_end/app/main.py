@@ -11,7 +11,7 @@ headers = {
     'Content-Type': 'application/json'
 }
 
-API_URL = 'https://aa9a-120-28-169-50.ngrok-free.app'  # Node.js API URL
+API_URL = 'https://911c-120-28-169-50.ngrok-free.app'  # Node.js API URL
 
 
 @app.route('/')

@@ -1038,18 +1038,39 @@ async function main(functionKey,url){
     await page.waitForTimeout(5000);
     const cookies = JSON.parse(fs.readFileSync('airbnb.json', 'utf-8'));
     await context.addCookies(cookies);
-    await page.goto(`https://www.airbnb.com/hosting/listings/editor/${url}`, { waitUntil: 'load', timeout: 60000 });
-    await page.waitForTimeout(10000);
-    await page.waitForSelector('body', { state: 'visible' });
-    await page.screenshot({ path: 'screenshot.png', fullPage: true })
-    if(await page.url() == 'https://www.airbnb.com/hosting/listings'){
-        return {'error':`invalid listing id`};
-    }else{
-    const functionGet = functionName[functionKey];
-    const result = await functionGet(page);
-    browser.close();
-    console.log(`browser ${functionKey} finish`);
-    return result;
+    try{
+        await page.goto(`https://www.airbnb.com/hosting/listings/editor/${url}`, { waitUntil: 'load', timeout: 60000 });
+        await page.waitForTimeout(10000);
+        await page.waitForSelector('body', { state: 'visible' });
+        await page.screenshot({ path: 'screenshot.png', fullPage: true })
+        if(await page.url() == 'https://www.airbnb.com/hosting/listings'){
+            return {'error':`invalid listing id`};
+        }else{
+        const functionGet = functionName[functionKey];
+        const result = await functionGet(page);
+        browser.close();
+        console.log(`browser ${functionKey} finish`);
+        return result;
+    }
+}
+    catch(error){
+        try{
+            await page.goto(`https://www.airbnb.com/hosting/listings/editor/${url}`, { waitUntil: 'load', timeout: 60000 });
+            await page.waitForTimeout(10000);
+            await page.waitForSelector('body', { state: 'visible' });
+            await page.screenshot({ path: 'screenshot.png', fullPage: true })
+            if(await page.url() == 'https://www.airbnb.com/hosting/listings'){
+                return {'error':`invalid listing id`};
+            }else{
+            const functionGet = functionName[functionKey];
+            const result = await functionGet(page);
+            browser.close();
+            console.log(`browser ${functionKey} finish`);
+            return result;
+        }
+    }catch(error){
+        return {'error':`failed to scrape`};
+    }
     }
     
 }
