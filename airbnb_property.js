@@ -1048,7 +1048,7 @@ async function main(functionKey,url){
         }
     }
     await page.waitForTimeout(10000);
-    await page.waitForSelector('body', { state: 'visible' });
+    // await page.waitForSelector('body', { state: 'visible' });
     await page.screenshot({ path: 'screenshot.png', fullPage: true })
     if(await page.url() == 'https://www.airbnb.com/hosting/listings'){
         return {'error':`invalid listing id`};
