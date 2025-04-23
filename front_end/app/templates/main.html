@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Airbnb Tools</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f1f1;
+      margin: 0;
+    }
+
+    .navbar {
+      background-color: #007bff;
+      padding: 15px 30px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .navbar ul {
+      list-style: none;
+      display: flex;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar li {
+      margin-left: 20px;
+    }
+
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s ease;
+      cursor: pointer;
+    }
+
+    .navbar a:hover {
+      color: #ffc107;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 500px;
+      margin: 40px auto;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      display: none;
+    }
+
+    .active {
+      display: block;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      font-weight: bold;
+      padding: 10px 20px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .scraper-button {
+      display: inline-block;
+      background-color: #f1f1f1;
+      color: #007bff;
+      padding: 10px 20px;
+      margin: 5px;
+      border: 1px solid #007bff;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .scraper-button.selected {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .scraper-button:hover {
+      background-color: #0056b3;
+      color: white;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .json-container {
+      font-family: Arial, sans-serif;
+      white-space: pre-wrap;
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+    .facebook-btn {
+      background-color: #3b5998;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 12px 20px;
+      border-radius: 5px;
+      text-align: center;
+      display: block;
+      margin: 20px 0;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+
+    .facebook-btn:hover {
+      background-color: #2d4373;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 500px;
+      margin: 40px auto;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      display: none;
+    }
+
+    .active {
+      display: block;
+    }
+
+    input[type="text"], textarea, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    h2 {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="navbar">
+  <h1>Airbnb Tools</h1>
+  <ul>
+    <li><a onclick="showSection('scraperSection')">Property</a></li>
+    <li><a onclick="showSection('arrivalSection')">Arrival Guide</a></li>
+    <li><a onclick="showSection('facebookSection')">Post to Facebook</a></li>
+  </ul>
+</div>
+
+<!-- Scraper Section -->
+<div class="container active" id="scraperSection">
+  <h2>Scraper Functions</h2>
+  <label>Select Scraper Functions:</label>
+  <div id="scraperFunctions">
+    <div class="scraper-button" data-value="get_title">get_title</div>
+    <div class="scraper-button" data-value="get_property_type">get_property_type</div>
+    <div class="scraper-button" data-value="get_pricing">get_pricing</div>
+    <div class="scraper-button" data-value="get_availability">get_availability</div>
+    <div class="scraper-button" data-value="get_number_of_guest">get_number_of_guest</div>
+    <div class="scraper-button" data-value="get_description">get_description</div>
+    <div class="scraper-button" data-value="get_amenities">get_amenities</div>
+    <div class="scraper-button" data-value="get_location">get_location</div>
+    <div class="scraper-button" data-value="get_booking_setting">get_booking_setting</div>
+    <div class="scraper-button" data-value="get_house_rules">get_house_rules</div>
+    <div class="scraper-button" data-value="get_guest_safety">get_guest_safety</div>
+    <div class="scraper-button" data-value="get_cancellation_policy">get_cancellation_policy</div>
+    <div class="scraper-button" data-value="get_custom_link">get_custom_link</div>
+    <input type="text" id="url" placeholder="Enter Airbnb ID" required>
+  </div>
+  <button id="loadingBtn" class="btn btn-primary" type="button" disabled style="display: none;">
+    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+    Loading...
+  </button>
+  
+  <!-- Regular Run button -->
+  <button id="runBtn" onclick="runScraper()">Run Scraper</button>
+  
+  
+  <div id="output" hidden>
+    <h2>Output:</h2>
+    <div id="jsonDisplay" class="json-container"></div>
+  </div>
+</div>
+
+<div class="container" id="facebookSection">
+    <h2>Post to Facebook</h2>
+    <label>Post URL:</label>
+    <input type="text" id="url" placeholder="https://facebook.com/">
+  
+    <label>Feeling Emoji:</label>
+    <input type="text" id="feelingEmoji" placeholder="😊">
+  
+    <label>Post Text:</label>
+    <textarea id="textPost" placeholder="Write your message here..."></textarea>
+  
+    <label>File Path:</label>
+    <input type="text" id="file" placeholder="/path/to/image.jpg">
+  
+    <button onclick="postToFacebook()">Post to Facebook</button>
+    <button class="facebook-btn" onclick="shareOnFacebook()">Share on Facebook</button>
+  
+    <div id="facebookResult"></div>
+  </div>
+
+
+  <div class="container" id="arrivalSection">
+    <h2>Arrival Guide Functions</h2>
+    <label>Select Functions:</label>
+    <div id="scraperFunctions">
+      <div class="scraper-button" data-value="get_check_in">get_check_in</div>
+      <div class="scraper-button" data-value="get_direction">get_direction</div>
+      <div class="scraper-button" data-value="get_check_in_method">get_check_in_method</div>
+      <div class="scraper-button" data-value="get_wifi_details">get_wifi_details</div>
+      <div class="scraper-button" data-value="get_home_manual">get_home_manual</div>
+      <div class="scraper-button" data-value="get_checkout_instruction">get_checkout_instruction</div>
+      <div class="scraper-button" data-value="get_interaction_preferences">get_interaction_preferences</div>
+      <input type="text" id="url" placeholder="Enter Airbnb ID" required>
+    </div>
+    <button id="loadingBtn" class="btn btn-primary" type="button" disabled style="display: none;">
+      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+      Loading...
+    </button>
+    
+    <!-- Regular Run button -->
+    <button id="runBtn" onclick="runScraper()">Run Scraper</button>
+    
+    
+    <div id="output" hidden>
+      <h2>Output:</h2>
+      <div id="jsonDisplay" class="json-container"></div>
+    </div>
+  </div>
+
+<script>
+  const API_URL = 'http://localhost:3000';
+
+  function showSection(sectionId) {
+    const sections = document.querySelectorAll('.container');
+    sections.forEach(section => section.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
+  }
+
+  document.querySelectorAll('.scraper-button').forEach(button => {
+    button.addEventListener('click', () => {
+      button.classList.toggle('selected');
+    });
+  });
+
+  async function runScraper() {
+  const selectedFunctions = document.querySelectorAll('.scraper-button.selected');
+  let url = document.getElementById('url').value;
+  if (!url) {
+    alert('Please enter a valid Airbnb ID.');
+    return;
+  }
+  console.log(url);
+  if (selectedFunctions.length === 0) {
+    alert('Please select at least one scraper function.');
+    return;
+  }
+  // document.getElementById('output').hidden = true; 
+  const runBtn = document.getElementById('runBtn');
+  const loadingBtn = document.getElementById('loadingBtn');
+  runBtn.style.display = 'none';      // Hide the Run button
+  loadingBtn.style.display = 'inline-block';
+
+  const functionNames = Array.from(selectedFunctions).map(button => button.getAttribute('data-value'));
+  console.log(functionNames,url);
+  try {
+    const res = await fetch(`${API_URL}/airbnb/scraper`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({functionNames,url})
+    });
+
+    const data = await res.json();
+    document.getElementById('output').hidden = false;
+    document.getElementById('jsonDisplay').textContent = JSON.stringify(data.message, null, 2);
+  } catch (error) {
+      console.log('Error:', error);
+  } finally {
+    runBtn.style.display = 'inline-block';
+    loadingBtn.style.display = 'none';
+  }
+}
+
+
+  async function postToFacebook() {
+    const url = document.getElementById('url').value;
+    const feelingEmoji = document.getElementById('feelingEmoji').value;
+    const textPost = document.getElementById('textPost').value;
+    const file = document.getElementById('file').value;
+
+    if (!url || !feelingEmoji || !textPost || !file) {
+      alert('Please fill out all fields.');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/facebook/post`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url,
+          feelingEmoji,
+          textPost,
+          file
+        })
+      });
+
+      const data = await res.json();
+      document.getElementById('facebookResult').textContent = `Posted: ${data.message}`;
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  function shareOnFacebook() {
+    const url = document.getElementById('url').value;
+    const postMessage = document.getElementById('textPost').value;
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(postMessage)}`;
+
+    window.open(facebookUrl, '_blank', 'width=600,height=400');
+
+    
+  }
+</script>
+
+</body>
+</html>

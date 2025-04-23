@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login to Airbnb Scraper</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+  <style>
+    body {
+      background: #f3f4f6;
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-container {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 300px;
+      text-align: center;
+    }
+
+    .login-container input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .login-container button {
+      padding: 10px;
+      width: 100%;
+      border: none;
+      background: #007bff;
+      color: white;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .alert.success {
+      color: green;
+    }
+
+    .alert.danger {
+      color: red;
+      margin-top: 10px;
+    }
+
+    .loading {
+      display: none;
+      margin-top: 10px;
+      color: #555;
+      font-size: 14px;
+    }
+  </style>
+
+  <div class="login-container">
+    <h2>Login</h2>
+    <form id="loginForm" method="post" action="/login">
+      <input type="email" name="email" placeholder="Enter email" required>
+      <input type="password" name="password" placeholder="Enter password" required>
+      <button type="submit" id="logingLoading">Login</button>
+    </form>
+
+    <div class="loading" id="loadingText">Logging in...</div>
+  </div>
+
+  <script>
+    const socket = io();
+
+    document.getElementById('loginForm').addEventListener('submit', () => {
+      document.getElementById('loadingText').style.display = 'block';
+    });
+
+    socket.on('login_status', data => {
+      const loading = document.getElementById('loadingText');
+      const logingLoading = document.getElementById('logingLoading');
+
+      if (data.status === 'success') {
+        loading.textContent = 'Login successful!';
+        loading.style.color = 'green';
+      } else if (data.status === 'error') {
+        loading.textContent = 'Login failed.';
+        loading.style.color = 'red';
+      } else if (data.status === 'loading') {
+        logingLoading.textContent = 'Logging in...';
+        logingLoading.style.color = '#555';
+      }
+    });
+  </script>
+</body>
+</html>

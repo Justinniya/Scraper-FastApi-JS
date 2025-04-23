@@ -1,0 +1,47 @@
+{
+  "Title": "das",
+  "availability": {
+    "minimum_night": "1",
+    "maximum_night": "365",
+    "advance_notice": "Same day",
+    "same_day": "12:00 AM",
+    "request_less_then_1_day": "true"
+  },
+  "description": {
+    "listing_des": "You'll always remember your time at this unique place to stay.",
+    "your_property": "Add details",
+    "guest_access": "Add details",
+    "interaction_with_guest": "Add details",
+    "other_details": "Add details"
+  },
+  "booking_setting": {
+    "title": "Approve your first 5 bookings"
+  },
+  "guest_safety": {
+    "propert_info": {
+      "guests_must_climb_stairs": "false",
+      "potential_noise_during_stays": "false",
+      "pet_live_at_the_property": "false",
+      "no_parking_on_the_property": "false",
+      "property_has_shared_spaces": "false",
+      "limited_essential_amenities": "false",
+      "weapon_on_the_property": "false"
+    },
+    "safety_considerations": {
+      "not_a_good_fit_for_children_2_12": "false",
+      "not_a_good_fit_for_infats_under_2": "false",
+      "pool_or_hot_tub_doesnt_have_a_gate_or_lock": "false",
+      "nearby_water_like_lake_or_river": "false",
+      "climbing_or_play": "false",
+      "heights_without_rails_or_protection": "false",
+      "potential_dangerous_animals_on_the_property": "false"
+    },
+    "safety_devices": {
+      "exterior_security_camera_present": "false",
+      "noise_decibel_monitor_present": "false",
+      "carbon_monoxide_alarm": "false",
+      "smoke_alarm": "false"
+    }
+  },
+  "custom_link": "airbnb.com/h/"
+}
