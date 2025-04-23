@@ -246,7 +246,7 @@ async function get_location(page){
     await page.waitForTimeout(5000);
     let bodyOffeatures = await page.locator('.b1sjcma8.dir.dir-ltr');
     let loopfor  = await bodyOffeatures.locator('.twad414.dir.dir-ltr').count();
-    // console.log(loopfor);
+    console.log(loopfor);
     let location_feature_result = [];
     for (let i = 0; i < loopfor; i++) {
         let location_feature_result_text = await bodyOffeatures.locator('.twad414.dir.dir-ltr').nth(i).elementHandle();
@@ -1038,18 +1038,10 @@ async function main(functionKey,url){
     await page.waitForTimeout(5000);
     const cookies = JSON.parse(fs.readFileSync('airbnb.json', 'utf-8'));
     await context.addCookies(cookies);
-    try{
-        await page.goto(`https://www.airbnb.com/hosting/listings/editor/${url}`, { waitUntil: 'load', timeout: 60000 });
-    }catch(err){
-        try{
-            await page.goto(`https://www.airbnb.com/hosting/listings/editor/${url}`, { waitUntil: 'load', timeout: 60000 });
-        }catch(err){
-            return {'error':`failed to scrape`};
-        }
-    }
+    await page.goto(`https://www.airbnb.com/hosting/listings/editor/${url}`)
     await page.waitForTimeout(10000);
-    // await page.waitForSelector('body', { state: 'visible' });
-    // await page.screenshot({ path: 'screenshot.png', fullPage: true })
+    await page.waitForSelector('body', { state: 'visible' });
+    await page.screenshot({ path: `${functionKey}`, fullPage: true })
     if(await page.url() == 'https://www.airbnb.com/hosting/listings'){
         return {'error':`invalid listing id`};
     }else{
