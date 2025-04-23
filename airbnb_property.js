@@ -1055,6 +1055,7 @@ async function main(functionKey,url){
 }
     catch(error){
         console.log('error at ', functionKey);
+        consolr.log(error);
 
     }
     
