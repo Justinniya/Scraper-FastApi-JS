@@ -11,7 +11,7 @@ headers = {
     'Content-Type': 'application/json'
 }
 
-API_URL = 'http://localhost:3000'  # Node.js API URL
+API_URL = 'http://192.168.30.31:3000'  # Node.js API URL
 
 
 @app.route('/')
