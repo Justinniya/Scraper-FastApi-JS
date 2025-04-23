@@ -1040,37 +1040,24 @@ async function main(functionKey,url){
     await context.addCookies(cookies);
     try{
         await page.goto(`https://www.airbnb.com/hosting/listings/editor/${url}`, { waitUntil: 'load', timeout: 60000 });
-        await page.waitForTimeout(10000);
-        await page.waitForSelector('body', { state: 'visible' });
-        await page.screenshot({ path: 'screenshot.png', fullPage: true })
-        if(await page.url() == 'https://www.airbnb.com/hosting/listings'){
-            return {'error':`invalid listing id`};
-        }else{
-        const functionGet = functionName[functionKey];
-        const result = await functionGet(page);
-        browser.close();
-        console.log(`browser ${functionKey} finish`);
-        return result;
-    }
-}
-    catch(error){
+    }catch(err){
         try{
             await page.goto(`https://www.airbnb.com/hosting/listings/editor/${url}`, { waitUntil: 'load', timeout: 60000 });
-            await page.waitForTimeout(10000);
-            await page.waitForSelector('body', { state: 'visible' });
-            await page.screenshot({ path: 'screenshot.png', fullPage: true })
-            if(await page.url() == 'https://www.airbnb.com/hosting/listings'){
-                return {'error':`invalid listing id`};
-            }else{
-            const functionGet = functionName[functionKey];
-            const result = await functionGet(page);
-            browser.close();
-            console.log(`browser ${functionKey} finish`);
-            return result;
+        }catch(err){
+            return {'error':`failed to scrape`};
         }
-    }catch(error){
-        return {'error':`failed to scrape`};
     }
+    await page.waitForTimeout(10000);
+    await page.waitForSelector('body', { state: 'visible' });
+    await page.screenshot({ path: 'screenshot.png', fullPage: true })
+    if(await page.url() == 'https://www.airbnb.com/hosting/listings'){
+        return {'error':`invalid listing id`};
+    }else{
+    const functionGet = functionName[functionKey];
+    const result = await functionGet(page);
+    browser.close();
+    console.log(`browser ${functionKey} finish`);
+    return result;
     }
     
 }
