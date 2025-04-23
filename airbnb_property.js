@@ -1041,7 +1041,8 @@ async function main(functionKey,url){
     await page.goto(`https://www.airbnb.com/hosting/listings/editor/${url}`,{timeout:60000});
     await page.waitForTimeout(10000);
     await page.waitForSelector('body', { state: 'visible' });
-    await page.screenshot({ path: functionKey, fullPage: true })
+    let screenshot_path = `airbnb_screenshot/${functionKey}.png`;
+    await page.screenshot({ path:screenshot_path , fullPage: true })
     if(await page.url() == 'https://www.airbnb.com/hosting/listings'){
         return {'error':`invalid listing id`};
     }else{
