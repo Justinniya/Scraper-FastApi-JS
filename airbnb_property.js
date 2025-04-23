@@ -1038,7 +1038,7 @@ async function main(functionKey,url){
     await page.waitForTimeout(5000);
     const cookies = JSON.parse(fs.readFileSync('airbnb.json', 'utf-8'));
     await context.addCookies(cookies);
-    await page.goto(`https://www.airbnb.com/hosting/listings/editor/${url}`,{ waitUntil: 'domcontentloaded' });
+    await page.goto(`https://www.airbnb.com/hosting/listings/editor/${url}`);
     await page.waitForTimeout(10000);
     // await page.waitForSelector('body', { state: 'visible' });
     // let screenshot_path = `airbnb_screenshot/${functionKey}.png`;
