@@ -246,7 +246,7 @@ async function get_location(page){
     await page.waitForTimeout(5000);
     let bodyOffeatures = await page.locator('.b1sjcma8.dir.dir-ltr');
     let loopfor  = await bodyOffeatures.locator('.twad414.dir.dir-ltr').count();
-    console.log(loopfor);
+    // console.log(loopfor);
     let location_feature_result = [];
     for (let i = 0; i < loopfor; i++) {
         let location_feature_result_text = await bodyOffeatures.locator('.twad414.dir.dir-ltr').nth(i).elementHandle();
