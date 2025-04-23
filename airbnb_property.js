@@ -1032,13 +1032,13 @@ async function main(functionKey,url){
         'get_cancellation_policy': get_cancellation_policy,
         'get_custom_link': get_custom_link
     }
-    const browser = await chromium.launch({ headless: true,args: ['--start-maximized'] });
+    const browser = await chromium.launch({ headless: true,args: ['--start-maximized','--no-sandbox']});
     const context = await browser.newContext({userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'});
     const page = await context.newPage();
     await page.waitForTimeout(5000);
     const cookies = JSON.parse(fs.readFileSync('airbnb.json', 'utf-8'));
     await context.addCookies(cookies);
-    await page.goto(`https://www.airbnb.com/hosting/listings/editor/${url}`,{timeout:60000});
+    await page.goto(`https://www.airbnb.com/hosting/listings/editor/${url}`,{ waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(10000);
     // await page.waitForSelector('body', { state: 'visible' });
     // let screenshot_path = `airbnb_screenshot/${functionKey}.png`;
