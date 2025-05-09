@@ -3,7 +3,7 @@ const fs = require('fs');
 
 async function loginToAirbnb(email, password) {
     try{
-        const browser = await chromium.launch({ headless: true, args: ['--start-maximized'] });
+        const browser = await chromium.launch({ headless: false, args: ['--start-maximized'] });
         const context = await browser.newContext({userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'});
         const page = await context.newPage();
         await page.goto('https://www.airbnb.com/login');
@@ -21,7 +21,7 @@ async function loginToAirbnb(email, password) {
         await page.waitForTimeout(2000);
         let email_button = await page.locator("xpath=//*[@id='FMP-target']/div/div/div/div[3]/div/div[3]/button");
         await email_button.click();
-        await page.waitForTimeout(2000);
+        await page.waitForTimeout(10000);
         // let email_input = await page.locator("xpath=user[email]");
         await page.keyboard.insertText(email);
         await page.keyboard.press('Enter');
@@ -39,14 +39,17 @@ async function loginToAirbnb(email, password) {
             fs.writeFileSync('airbnb.json', JSON.stringify(cookies, null, 2));
 
             await browser.close();
+            await page.waitForTimeout(50000);
             return true;
         }
         else {
             await browser.close();
+            await page.waitForTimeout(50000);
             return false;
         }
     }catch(err){
         console.log('Error:', err);
+        await page.waitForTimeout(50000);
         return false;
     }
 }

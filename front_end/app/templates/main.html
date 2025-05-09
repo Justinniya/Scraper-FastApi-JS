@@ -165,6 +165,55 @@
     h2 {
       text-align: center;
     }
+
+    .container1{
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 1200px;
+      margin: auto;
+    }
+    h2 {
+      margin-top: 30px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .checkbox-group, .checkbox-group label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    .images-preview img {
+      width: 100px;
+      margin: 5px;
+      border-radius: 5px;
+    }
+
   </style>
 </head>
 <body>
@@ -175,6 +224,7 @@
     <li><a onclick="showSection('scraperSection')">Property</a></li>
     <li><a onclick="showSection('arrivalSection')">Arrival Guide</a></li>
     <li><a onclick="showSection('facebookSection')">Post to Facebook</a></li>
+    <li><a onclick="showSection('automation')">Airbnb Automation</a></li>
   </ul>
 </div>
 
@@ -262,9 +312,215 @@
     </div>
   </div>
 
-<script>
-  const API_URL = 'http://192.168.30.31:3000';
 
+  <div class="container" id="automation">
+    <h1>Place Details Form</h1>
+
+    <form id="placeForm">
+
+      <h2>Basic Details</h2>
+
+      <label>Choose Place</label>
+      <select name="choose_place" id="choose_place" onchange="choose()">
+        <option value="Hotel">Hotel</option>
+        <option value="House">House</option>
+        <option value="Apartment">Apartment</option>
+      </select>
+
+      <label>Place Guest Will</label>
+      <select name="place_guest_will" id="place_guest_will" onchange="renderDynamicForm()">
+        <option value="a_room">A Room</option>
+        <option value="a_shared_room_in_a_hostel">A Shared Room in a Hostel</option>
+      </select>
+
+      <h2>Address</h2>
+      <label>Unit Level</label>
+      <input type="text" name="unitLevelValue">
+
+      <label>Building Name</label>
+      <input type="text" name="buildingNameValue">
+
+      <label>Street Address</label>
+      <input type="text" name="streetAddressValue">
+
+      <label>Barangay/District</label>
+      <input type="text" name="brgyDistrictValue">
+
+      <label>City/Municipality</label>
+      <input type="text" name="cityMunicipalityValue">
+
+      <label>Postal Code</label>
+      <input type="text" name="postalCodeValue">
+
+      <label>Province</label>
+      <input type="text" name="provinceValue">
+
+      <h2>Guest Capacity</h2>
+
+      <label>Number of Guests</label>
+      <input type="number" name="number_of_guests">
+
+      <label>Number of Beds</label>
+      <input type="number" name="number_of_beds">
+
+      <!-- Dynamic fields based on place_guest_will -->
+      <div id="dynamic-fields"></div>
+
+      <h2>Others in Place</h2>
+      <div class="checkbox-group">
+        <label><input type="checkbox" name="else_might_be_there" value="Me"> Me</label>
+        <label><input type="checkbox" name="else_might_be_there" value="My_family"> My Family</label>
+        <label><input type="checkbox" name="else_might_be_there" value="Other_guests"> Other Guests</label>
+        <label><input type="checkbox" name="else_might_be_there" value="Roommates"> Roommates</label>
+      </div>
+
+      <h2>What Your Place Offers</h2>
+      <div class="checkbox-group" style="flex-wrap: wrap;">
+        <label><input type="checkbox" name="offers" value="Wifi"> Wifi</label>
+        <label><input type="checkbox" name="offers" value="TV"> TV</label>
+        <label><input type="checkbox" name="offers" value="Kitchen"> Kitchen</label>
+        <label><input type="checkbox" name="offers" value="Washer"> Washer</label>
+        <label><input type="checkbox" name="offers" value="Free_parking_on_premises"> Free Parking</label>
+        <label><input type="checkbox" name="offers" value="Air_conditioning"> Air Conditioning</label>
+        <label><input type="checkbox" name="offers" value="Dedicated_workspace"> Dedicated Workspace</label>
+      </div>
+
+      <h2>Image URLs</h2>
+      <label>Enter image URLs separated by commas</label>
+      <textarea name="imageUrls" rows="3"></textarea>
+
+      <h2>Describe Hotel</h2>
+      <div class="checkbox-group">
+        <label><input type="checkbox" name="describe_hotel" value="Charming"> Charming</label>
+        <label><input type="checkbox" name="describe_hotel" value="Hip"> Hip</label>
+        <label><input type="checkbox" name="describe_hotel" value="Stylish"> Stylish</label>
+        <label><input type="checkbox" name="describe_hotel" value="Upscale"> Upscale</label>
+        <label><input type="checkbox" name="describe_hotel" value="Central"> Central</label>
+        <label><input type="checkbox" name="describe_hotel" value="Unique"> Unique</label>
+      </div>
+
+      <h2>Description</h2>
+      <textarea name="description" rows="5"></textarea>
+
+      <h2>Booking Settings</h2>
+
+      <label>Pick Your Booking Settings</label>
+      <select name="pick_your_booking_settings">
+        <option value="approve_your_first_5_booking">Approve your first 5 bookings</option>
+        <option value="use_instant_book">Use Instant Book</option>
+      </select>
+
+      <label>Choose Who to Welcome for First Reservation</label>
+      <select name="choose_who_to_welcome_for_your_first_reservation">
+        <option value="any_airbnb_guest">Any Airbnb Guest</option>
+        <option value="an_experienced_guest">An Experienced Guest</option>
+      </select>
+
+      <h2>Discounts</h2>
+      <div class="checkbox-group">
+        <label><input type="checkbox" name="add_discount" value="new_listing_promotion"> New Listing Promotion</label>
+        <label><input type="checkbox" name="add_discount" value="weekly_discount"> Weekly Discount</label>
+        <label><input type="checkbox" name="add_discount" value="monthly_discount"> Monthly Discount</label>
+      </div>
+
+      <h2>Safety Details</h2>
+      <div class="checkbox-group">
+        <label><input type="checkbox" name="share_safety_details" value="exterior_security_camera"> Exterior Security Camera</label>
+        <label><input type="checkbox" name="share_safety_details" value="noise_decibel_monitor"> Noise Decibel Monitor</label>
+        <label><input type="checkbox" name="share_safety_details" value="weapons_on_property"> Weapons on Property</label>
+      </div>
+
+      <label>If you selected "Exterior Security Camera", write a message:</label>
+      <textarea name="camera_message" rows="3"></textarea>
+
+      <button type="submit">Submit</button>
+    </form>
+
+</div>
+
+<script>
+  function choose() {
+    const choose_place = document.getElementById('choose_place').value;
+    const selectElement = document.getElementById('place_guest_will');
+    
+    // Add the new option only when "house" is selected
+    if (choose_place === 'house') {
+      // Check if the option is already added to prevent duplicates
+      if (!document.querySelector('option[value="a_entire_place"]')) {
+        const newOption = document.createElement('option');
+        newOption.value = 'a_entire_place';
+        newOption.textContent = 'A Entire Place';
+        selectElement.appendChild(newOption); // Append the new option
+      }
+    } else {
+      // Remove the "A Entire Place" option if it exists
+      const optionToRemove = document.querySelector('option[value="a_entire_place"]');
+      if (optionToRemove) {
+        selectElement.removeChild(optionToRemove);
+      }
+    }
+
+    // Call renderDynamicForm to handle other changes
+    renderDynamicForm();
+  }
+
+  function renderDynamicForm() {
+    const placeGuestWill = document.getElementById('place_guest_will').value;
+    const dynamicFieldsContainer = document.getElementById('dynamic-fields');
+    dynamicFieldsContainer.innerHTML = ''; // Clear previous dynamic fields
+
+    if (placeGuestWill === 'a_room') {
+      // Add fields specific to 'a_room'
+      dynamicFieldsContainer.innerHTML += `
+        <h3>Room Details</h3>
+        <label>Number of Bedrooms</label>
+        <input type="number" name="number_of_bedroom">
+
+        <label>Bedroom Lock</label>
+        <select name="bedroom_lock">
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </select>
+
+        <h3>Bathrooms</h3>
+        <label>Private and Attached</label>
+        <input type="number" name="private_and_attached">
+
+        <label>Dedicated Bathrooms</label>
+        <input type="number" name="dedicated">
+
+        <label>Shared Bathrooms</label>
+        <input type="number" name="shared">
+      `;
+    } else if (placeGuestWill === 'a_shared_room_in_a_hostel') {
+      // Add fields specific to 'a_shared_room_in_a_hostel'
+      dynamicFieldsContainer.innerHTML += `
+        <h3>Hostel Details</h3>
+        <label>Number of Bathrooms</label>
+        <input type="number" name="number_of_bathrooms">
+      `;
+    } else if (placeGuestWill === 'a_entire_place') {
+      // You can add additional logic for "A Entire Place" if needed
+      dynamicFieldsContainer.innerHTML += `
+        <h3>Entire Place Details</h3>
+        <label>Number of Rooms</label>
+        <input type="number" name="number_of_rooms">
+      `;
+    }
+  }
+  
+  // Call the function once on page load to render the appropriate fields based on the initial value of 'place_guest_will'
+  window.onload = function() {
+    renderDynamicForm();
+  };
+</script>
+
+<script>
+  // const API_URL = 'http://192.168.30.31:3000';
+  // const API_URL = 'https://ds5.d3.net/scraping'
+  // const API_URL = 'http://192.168.30.64:3000/scraping'
+  // const API_URL = 'http://192.168.30.41:3000/scraping'
+  const API_URL = 'http://localhost:3000/scraping'
   function showSection(sectionId) {
     const sections = document.querySelectorAll('.container');
     sections.forEach(section => section.classList.remove('active'));
@@ -300,6 +556,7 @@
   try {
     const res = await fetch(`${API_URL}/airbnb/scraper`, {
       method: 'POST',
+      // mode: 'no-cors',?\
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({functionNames,url})
     });
@@ -354,6 +611,114 @@
     window.open(facebookUrl, '_blank', 'width=600,height=400');
 
     
+  }
+
+  document.getElementById('placeForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevent default form submit
+    submit_button();
+  });
+
+  async function submit_button() {
+    const choose_place = document.getElementById('choose_place').value;
+    const place_guest_will = document.getElementById('place_guest_will').value;
+
+    // Get address fields
+    const address = {
+      unitLevelValue: document.querySelector('input[name="unitLevelValue"]').value,
+      buildingNameValue: document.querySelector('input[name="buildingNameValue"]').value,
+      streetAddressValue: document.querySelector('input[name="streetAddressValue"]').value,
+      brgyDistrictValue: document.querySelector('input[name="brgyDistrictValue"]').value,
+      cityMunicipalityValue: document.querySelector('input[name="cityMunicipalityValue"]').value,
+      postalCodeValue: document.querySelector('input[name="postalCodeValue"]').value,
+      provinceValue: document.querySelector('input[name="provinceValue"]').value,
+    };
+
+    // Guest capacity
+    const how_many_people_can_stay_here = {
+      number_of_guests: Number(document.querySelector('input[name="number_of_guests"]').value),
+      number_of_beds: Number(document.querySelector('input[name="number_of_beds"]').value),
+    };
+
+    if (place_guest_will === 'a_room') {
+      how_many_people_can_stay_here.number_of_bedroom = Number(document.querySelector('input[name="number_of_bedroom"]').value);
+      how_many_people_can_stay_here.bedroom_lock = document.querySelector('select[name="bedroom_lock"]').value === 'true';
+    }
+
+    // Bathrooms
+    let bathrooms_are_available_to_guests = {};
+    if (place_guest_will === 'a_room') {
+      bathrooms_are_available_to_guests = {
+        private_and_attached: Number(document.querySelector('input[name="private_and_attached"]').value),
+        dedicated: Number(document.querySelector('input[name="dedicated"]').value),
+        shared: Number(document.querySelector('input[name="shared"]').value),
+      };
+    } else if (place_guest_will === 'a_shared_room_in_a_hostel') {
+      bathrooms_are_available_to_guests = {
+        number_of_bathrooms: Number(document.querySelector('input[name="number_of_bathrooms"]').value),
+      };
+    } else if (place_guest_will === 'a_entire_place') {
+      how_many_people_can_stay_here.number_of_rooms = Number(document.querySelector('input[name="number_of_rooms"]').value);
+    }
+
+    // Else might be there (checkboxes)
+    const else_might_be_there = Array.from(document.querySelectorAll('input[name="else_might_be_there"]:checked')).map(el => el.value);
+
+    // Place offers (checkboxes)
+    const tell_guest_what_your_place_offer_function = Array.from(document.querySelectorAll('input[name="offers"]:checked')).map(el => el.value);
+
+    // Image URLs
+    const imageUrls = document.querySelector('textarea[name="imageUrls"]').value.split(',').map(url => url.trim()).filter(url => url !== '');
+
+    // Describe hotel (checkboxes)
+    const describe_hotel = Array.from(document.querySelectorAll('input[name="describe_hotel"]:checked')).map(el => el.value);
+
+    // Description
+    const description = document.querySelector('textarea[name="description"]').value;
+
+    // Booking settings
+    const pick_your_booking_settings = document.querySelector('select[name="pick_your_booking_settings"]').value;
+    const choose_who_to_welcome_for_your_first_reservation = document.querySelector('select[name="choose_who_to_welcome_for_your_first_reservation"]').value;
+
+    // Discounts (checkboxes)
+    const add_discount = Array.from(document.querySelectorAll('input[name="add_discount"]:checked')).map(el => el.value);
+
+    // Safety Details (checkboxes)
+    const share_safety_details = Array.from(document.querySelectorAll('input[name="share_safety_details"]:checked')).map(el => el.value);
+
+    // Camera Message
+    const camera_message = document.querySelector('textarea[name="camera_message"]').value;
+
+    // Assemble final data
+    const final_data = {
+      choose_place,
+      place_guest_will,
+      address,
+      how_many_people_can_stay_here,
+      bathrooms_are_available_to_guests,
+      else_might_be_there,
+      tell_guest_what_your_place_offer_function,
+      imageUrls,
+      describe_hotel,
+      description,
+      pick_your_booking_settings,
+      choose_who_to_welcome_for_your_first_reservation,
+      add_discount: add_discount,
+      share_safety_details: share_safety_details,
+    };
+
+    console.log(JSON.stringify(final_data, null, 2));
+    try {
+      const res = await fetch(`${API_URL}/airbnb/create_listing`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({"data":final_data})
+      });
+
+      const data = await res.json();
+      document.getElementById('facebookResult').textContent = `Posted: ${data.message}`;
+    } catch (error) {
+      console.error('Error:', error);
+    }
   }
 </script>
 

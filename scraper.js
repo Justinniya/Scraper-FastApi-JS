@@ -1,5 +1,4 @@
 const { chromium } = require('playwright');
-import { mainpasamain } from './try.js';
 const  path  = require('path');
 const fs = require('fs');
 const { strict } = require('assert');

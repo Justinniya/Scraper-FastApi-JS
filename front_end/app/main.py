@@ -10,8 +10,11 @@ socketio = SocketIO(app)
 headers = {
     'Content-Type': 'application/json'
 }
-
-API_URL = 'http://192.168.30.31:3000'  # Node.js API URL
+# API_URL = 'http://192.168.30.64:3000'
+# API_URL = 'http://192.168.30.41:3000'
+# API_URL = 'http://192.168.30.31:3000'  # Node.js API URL
+API_URL = 'http://localhost:3000'
+# API_URL = 'https://ds5.d3.net'
 
 
 @app.route('/')
@@ -36,7 +39,7 @@ def login():
         }
 
         socketio.emit('login_status', {'status': 'loading'})
-        response = requests.post(f'{API_URL}/airbnb/login', json=payload, headers=headers)
+        response = requests.post(f'{API_URL}/scraping/airbnb/login', json=payload, headers=headers)
 
         if response.status_code == 200 and response.json().get('response') == 'True':
             flash('Login successful!', 'success')
