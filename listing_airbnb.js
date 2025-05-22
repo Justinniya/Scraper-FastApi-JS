@@ -2,13 +2,14 @@ const { chromium } = require('playwright');
 const fs = require('fs');
 const { set } = require('date-fns/set');
 const axios = require('axios');
+const main_browser = require('./base_browser');
 
 async function listing_main(data) {
   console.log(data);
-    const browser = await chromium.launch({ headless: true ,args: ['--window-size=1920,1080'] });
-    const context = await browser.newContext({userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',viewport: { width: 1920, height: 1080 }});
+    const browser = await chromium.launch({ headless: false ,args: ['--window-size=1920,1080','--no-sandbox'] });
+    const context = await browser.newContext({userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',viewport: { width: 1420, height: 975 }});
     const page = await context.newPage();
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(3000);
     try{
     const cookies = JSON.parse(fs.readFileSync('airbnb_listing.json', 'utf-8'));
     await context.addCookies(cookies);
@@ -25,12 +26,15 @@ async function listing_main(data) {
     await page.locator('xpath=/html/body/div[9]/div/div/section/div/div/div[2]/div/div[2]/div[2]/div/div[1]/div[1]/div[1]/div[1]/label/div[2]').click();
     const StartDate = data['filter_start_date'];
     const [start_year,start_month, start_day] = StartDate.split('-').map(Number);
-    await selectDateFromCalendar(page, start_day, start_month, start_year, true);  
+    let result1 = formatYearMonthToWords(start_year,start_month);
+    await page.waitForTimeout(2000);
+    await selectDateFromCalendar(page, start_day, start_month, start_year, true,result1);  
 
     await page.locator('xpath=/html/body/div[9]/div/div/section/div/div/div[2]/div/div[2]/div[2]/div/div[1]/div[1]/div[2]/div[1]/label/div[2]').click();
     const EndDate = data['filter_end_date'];
     const [end_year,end_month, end_day] = EndDate.split('-').map(Number);
-    await selectDateFromCalendar(page, end_day, end_month, end_year, false); 
+    let result2 = formatYearMonthToWords(end_year,end_month);
+    await selectDateFromCalendar(page, end_day, end_month, end_year, false,result2); 
     await page.waitForTimeout(2000);
     
     // await footer.evaluate(el => el.scrollIntoView({ behavior: 'smooth', block: 'center' }));
@@ -38,10 +42,16 @@ async function listing_main(data) {
     let apply = await page.locator('xpath=/html/body/div[9]/div/div/section/div/div/div[2]/div/footer/button').nth(1);
     await apply.click({ force: true});
     
-    await page.waitForTimeout(20000);
-    let number_of_lines = await page.locator('[data-testid="host-reservations-table-row"]').count();
-    let final_listing;
+    await page.waitForTimeout(2000);
+    let next = true
     let sets = [];
+    let number = 1
+    while(next){
+      console.log(number);
+      number++;
+      await page.waitForTimeout(5000);
+      let number_of_lines = await page.locator('[data-testid="host-reservations-table-row"]').count();
+      let final_listing;
     
     for(let i = 0; number_of_lines>i; i++){
         let lines = await page.locator('[data-testid="host-reservations-table-row"]').nth(i);
@@ -51,12 +61,11 @@ async function listing_main(data) {
         let listing = await lines.locator('.cw5trde.atm_c8_km0zk7.atm_g3_18khvle.atm_fr_1m9t47k.atm_cs_6adqpa.atm_7l_jt7fhx.atm_40_4u5rid.atm_l8_8tjzot.atm_j3_kzqwjq.atm_lk_idpfg4_13mkcot.armbts6.atm_r3_1e5hqsa.dir.dir-ltr').nth(6).textContent();
         let price = await lines.locator('.cw5trde.atm_c8_km0zk7.atm_g3_18khvle.atm_fr_1m9t47k.atm_cs_6adqpa.atm_7l_jt7fhx.atm_40_4u5rid.atm_l8_8tjzot.atm_j3_kzqwjq.atm_lk_idpfg4_13mkcot.armbts6.atm_r3_1e5hqsa.dir.dir-ltr').nth(8).textContent();
         let code = await lines.locator('.cw5trde.atm_c8_km0zk7.atm_g3_18khvle.atm_fr_1m9t47k.atm_cs_6adqpa.atm_7l_jt7fhx.atm_40_4u5rid.atm_l8_8tjzot.atm_j3_kzqwjq.atm_lk_idpfg4_13mkcot.armbts6.atm_r3_1e5hqsa.dir.dir-ltr').nth(7).textContent();
-        const page1 = await context.newPage();
-        let url = `https://www.airbnb.com/hosting/reservations/completed?confirmationCode=${code}`
-        await page1.goto(url);
-        final_listing = await page1.locator('xpath=/html/body/div[9]/div/div/section/div/div/div[2]/div/div[2]/div/div/div/div[2]/div/div[1]/div[1]/div[2]').textContent();
-        await page1.close();
-        await page.bringToFront();
+        await page.waitForTimeout(5000);
+        await lines.locator('.l1ovpqvx.atm_1he2i46_1k8pnbi_10saat9.atm_yxpdqi_1pv6nv4_10saat9.atm_1a0hdzc_w1h1e8_10saat9.atm_2bu6ew_929bqk_10saat9.atm_12oyo1u_73u7pn_10saat9.atm_fiaz40_1etamxe_10saat9.b1p20n7u.atm_9j_tlke0l.atm_9s_1o8liyq.atm_gi_idpfg4.atm_mk_h2mmj6.atm_r3_1h6ojuz.atm_rd_glywfm.atm_3f_uuagnh.atm_70_5j5alw.atm_vy_1wugsn5.atm_tl_1gw4zv3.atm_9j_13gfvf7_1o5j5ji.c1n3e6jn.atm_bx_48h72j.atm_cs_10d11i2.atm_5j_t09oo2.atm_6h_t94yts.atm_66_nqa18y.atm_kd_glywfm.atm_uc_1lizyuv.atm_r2_1j28jx2.atm_c8_km0zk7.atm_g3_18khvle.atm_fr_1m9t47k.atm_jb_1yg2gu8.atm_4b_1qnzqti.atm_26_1qwqy05.atm_7l_jt7fhx.atm_l8_16nilfb.atm_uc_glywfm__1rrf6b5.atm_kd_glywfm_1w3cfyq.atm_uc_aaiy6o_1w3cfyq.atm_3f_glywfm_e4a3ld.atm_l8_idpfg4_e4a3ld.atm_gi_idpfg4_e4a3ld.atm_3f_glywfm_1r4qscq.atm_kd_glywfm_6y7yyg.atm_uc_glywfm_1w3cfyq_1rrf6b5.atm_kd_glywfm_pfnrn2_1oszvuo.atm_uc_aaiy6o_pfnrn2_1oszvuo.atm_3f_glywfm_1icshfk_1oszvuo.atm_l8_idpfg4_1icshfk_1oszvuo.atm_gi_idpfg4_1icshfk_1oszvuo.atm_3f_glywfm_b5gff8_1oszvuo.atm_kd_glywfm_2by9w9_1oszvuo.atm_uc_glywfm_pfnrn2_1o31aam.atm_tr_18md41p_csw3t1.atm_k4_kb7nvz_1o5j5ji.atm_4b_1qnzqti_1w3cfyq.atm_7l_jt7fhx_1w3cfyq.atm_70_1e7pbig_1w3cfyq.atm_4b_1qnzqti_pfnrn2_1oszvuo.atm_7l_jt7fhx_pfnrn2_1oszvuo.atm_70_1e7pbig_pfnrn2_1oszvuo.atm_4b_lb1gtz_1nos8r_uv4tnr.atm_26_zbnr2t_1nos8r_uv4tnr.atm_7l_jt7fhx_1nos8r_uv4tnr.atm_4b_1k0ymf0_4fughm_uv4tnr.atm_26_1qwqy05_4fughm_uv4tnr.atm_7l_9vytuy_4fughm_uv4tnr.atm_4b_lb1gtz_csw3t1.atm_26_zbnr2t_csw3t1.atm_7l_jt7fhx_csw3t1.atm_4b_1k0ymf0_1o5j5ji.atm_26_1qwqy05_1o5j5ji.atm_7l_9vytuy_1o5j5ji.dir.dir-ltr').click();
+        await page.waitForTimeout(5000);
+        final_listing = await page.locator('xpath=/html/body/div[9]/div/div/section/div/div/div[2]/div/div[2]/div/div/div/div[2]/div[1]/div[1]/div[2]').textContent();
+        await page.locator('xpath=/html/body/div[9]/div/div/section/div/div/div[2]/div/div[1]/button').click();
         const uid = findUID(final_listing,data);
         const result = separateCurrencySymbol(price);
         sets.push({
@@ -68,7 +77,37 @@ async function listing_main(data) {
             'price':result.amount,
             'airbnb_uid': uid
         });
-        
+        console.log({
+            'reservation_code': code,
+            'guest_name':guest_name,
+            'check_in':convertDateToDigits(check_in),
+            'check_out': convertDateToDigits(check_out),
+            'currency': result.symbol,
+            'price':result.amount,
+            'airbnb_uid': uid
+        });
+      }
+      
+    try {
+          const haveNext = page.locator('xpath=//*[@id="site-content"]/div[1]/section/footer/div/nav/div/button[4]');
+
+          // Check if button is visible and NOT disabled
+          const isVisible = await haveNext.isVisible();
+          const isEnabled = await haveNext.isEnabled();
+
+          if (isVisible && isEnabled) {
+            await page.waitForTimeout(2000);
+            await haveNext.click();
+            console.log('next');
+            // continue; // Only use this if you're inside a loop
+          } else {
+            console.log('Button is disabled or not visible');
+            next = false; // If you're in a loop, this breaks it
+          }
+
+        } catch (e) {
+          next = false;
+        }
     
     }
     // console.log(sets);
@@ -82,23 +121,39 @@ async function listing_main(data) {
     console.log(sets);
 };
 
-async function selectDateFromCalendar(page, day, month, year, isStartDate = true) {
+async function selectDateFromCalendar(page, day, month, year, isStartDate = true,year_and_date) {
   const mm = String(month).padStart(2, '0');
   const dd = String(day).padStart(2, '0');
-  const dateSelector = `[data-testid="calendar-day-${mm}/${dd}/${year}"]`;
+  let final_date = await page.locator('xpath=/html/body/div[9]/div/div/section/div/div/div[2]/div/div[2]/div[2]/div/div[2]/div/div/div/div[2]/div[2]/div/div[2]/div/div/div/h3').textContent();
+  while(true){
+    try{
+    
+      const dateSelector = `[data-testid="calendar-day-${mm}/${dd}/${year}"]`;
 
-  const dateInputSelector = isStartDate
-    ? '[data-testid="toolbar_filter_startdate_input"]'
-    : '[data-testid="toolbar_filter_enddate_input"]';
+      const dateInputSelector = isStartDate
+        ? '[data-testid="toolbar_filter_startdate_input"]'
+        : '[data-testid="toolbar_filter_enddate_input"]';
+      await page.click(dateInputSelector);
+
+    // Wait for the date to appear in the calendar
+      await page.waitForSelector(dateSelector);
+
+      // Click the date
+      await page.click(dateSelector);
+      break;
+  }catch{
+    if(isFirstBeforeSecond(final_date,year_and_date)){
+      await page.locator('xpath=/html/body/div[9]/div/div/section/div/div/div[2]/div/div[2]/div[2]/div/div[2]/div/div/div/div[2]/div[1]/div[2]/button').click();
+    }else{
+      await page.locator('xpath=/html/body/div[9]/div/div/section/div/div/div[2]/div/div[2]/div[2]/div/div[2]/div/div/div/div[2]/div[1]/div[1]/button').click();
+    }
+    
+    }
+  }
+  
 
   // Click on the date input field to open the calendar
-  await page.click(dateInputSelector);
-
-  // Wait for the date to appear in the calendar
-  await page.waitForSelector(dateSelector);
-
-  // Click the date
-  await page.click(dateSelector);
+  
 }
 
 async function response(sets)
@@ -157,6 +212,16 @@ function separateCurrencySymbol(amount) {
     }
     return null;
   }
+
+  function parseMonthYear(str) {
+  return new Date(str); // JavaScript can parse "May 2025" directly
+}
+
+function isFirstBeforeSecond(dateStr1, dateStr2) {
+  const d1 = parseMonthYear(dateStr1);
+  const d2 = parseMonthYear(dateStr2);
+  return d1 < d2;
+}
 
 function findUID(entry,dataParam) {
     const data = dataParam['for_catching_airbnb_uid'];
@@ -241,11 +306,16 @@ function sign(symbol){
       return currencyMap[symbol];
 }
 
+function formatYearMonthToWords(year,month) {
+  const date = new Date(`${year}-${month}-01`);
+  return date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+}
+
 
 // module.exports = { listing_main }
 
 data = {
-  "filter_start_date": "2025-05-02",
+  "filter_start_date": "2025-04-01",
   "filter_end_date": "2025-05-30",
   "airbnb_uid": "1285062459552924609",
   "for_catching_airbnb_uid": {
