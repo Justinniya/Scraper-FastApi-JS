@@ -124,7 +124,7 @@
 // sendCompletedListing();
 
 async function sendCompletedListing() {
-    const response = await fetch('http://192.168.1.54:4000/scraping/airbnb/login', {
+    const response = await fetch('http://192.168.1.60:4000/airbnb/login', {
       // const response = await fetch('http://192.168.1.54:3000/scraping/airbnb/completed_listing', {
         method: 'POST',
         headers: {
